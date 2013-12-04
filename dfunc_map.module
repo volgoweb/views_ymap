@@ -1,0 +1,62 @@
+<?php
+/*
+ * Модуль dfunc_map
+ */
+
+define('DM_OBJECT_NODE_TYPE_NAME', 'story');
+define('DM_MAP_VIEW_NAME', 'map');
+define('DM_MAP_DISPLAY_NAME', 'page_1');
+
+function dfunc_map_views_post_render(&$views) {
+ // dsm($views); 
+}
+function dfunc_map_views_pre_render(&$view) {
+  switch ($view->name) {
+    case DM_MAP_VIEW_NAME:
+      switch ($view->current_display) {
+        case DM_MAP_DISPLAY_NAME:
+          dm_add_js_vars_about_objects($view);
+          dm_add_scripts();
+          break;
+      }
+      break;
+  }
+}
+
+
+/**
+ * Создает в js объекты, содержащие данные о найденных объектах,
+ * которые надо отобразить на карте
+ */
+function dm_add_js_vars_about_objects($view) {
+  $objects = array();
+
+  $results = $view->result;
+  if (!empty($results)) {
+    foreach ($results as $i => $row) {
+      $object = array(
+        'title' => $row->node_title,
+        'lat' => $row->node_data_field_lat_field_lat_value,
+        'lon' => $row->node_data_field_lat_field_lon_value,
+      );
+      $objects[] = $object;
+    }
+  }
+
+  // выводим в js все найденные объекты
+  drupal_add_js(array(
+    'dfunc_map' => array(
+      'map_objects' => $objects,
+    ),
+  ), 'setting');
+}
+
+function dm_add_scripts() {
+  $external_js = 'http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU';
+  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
+
+  $module_path = drupal_get_path('module', 'dfunc_map');
+  drupal_add_js($module_path . '/js/dm_map.js');
+
+  drupal_add_css($module_path . '/css/dm_map.css');
+}
