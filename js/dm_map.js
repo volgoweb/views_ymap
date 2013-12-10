@@ -14,7 +14,7 @@ Drupal.dfunc_map.show_objects = function(objects) {
   var number = 1;
   var src_res = '';
   for (i in objects) {
-    var placemark = new ymaps.Placemark([objects[i].lon,objects[i].lat], {
+    var placemark = new ymaps.Placemark([objects[i].lat,objects[i].lon], {
       iconContent: number,
         balloonContentHeader: '<div style="color:#ff0303;font-weight:bold">'+objects[i].title+'</div>',
         balloonContentBody: '<div style="font-size:13px;"><div><strong>Адрес:</strong> '+objects[i].title + '</div></div>'   
@@ -39,7 +39,7 @@ Drupal.dfunc_map.go_to = function(lat, lon, title) {
 	var map = Drupal.dfunc_map.map;
 	var myCollection = Drupal.dfunc_map.myCollection;
 
-  map.setCenter([lon, lat], 16);
+  map.setCenter([lat, lon], 13);
 
   myCollection.each(function (item) {
     if (item.properties.get('balloonContentHeader') == '<div style="color:#ff0303;font-weight:bold">'+title+'</div>') {
@@ -68,7 +68,7 @@ Drupal.behaviors.dm_map = function() {
 
 	
 	ymaps.ready(function () {
-    Drupal.dfunc_map.map = new ymaps.Map('ymap', {
+    Drupal.dfunc_map.map = new ymaps.Map('services-ymap', {
         center: [56.326944, 44.0075],
         zoom: 15,
         type: 'yandex#map',

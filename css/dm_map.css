@@ -1,4 +1,26 @@
-#ymap {
-  height: 800px;
-  width: 800px;
+#services-ymap {
+  height: 570px;
+  width: 570px;
 }
+
+
+.in-row {
+  overflow: hidden;
+}
+
+.content-left-sidebar {
+  float: left;
+}
+
+.content-right-sidebar {
+  float: right;
+}
+
+.services-list {
+  width: 310px;
+}
+
+.services-map {
+  width: 570px;
+}
+

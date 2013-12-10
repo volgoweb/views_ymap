@@ -3,7 +3,7 @@
  * Модуль dfunc_map
  */
 
-define('DM_OBJECT_NODE_TYPE_NAME', 'story');
+define('DM_OBJECT_NODE_TYPE_NAME', 'service_center');
 define('DM_MAP_VIEW_NAME', 'map');
 define('DM_MAP_DISPLAY_NAME', 'page_1');
 
@@ -36,8 +36,8 @@ function dm_add_js_vars_about_objects($view) {
     foreach ($results as $i => $row) {
       $object = array(
         'title' => $row->node_title,
-        'lat' => $row->node_data_field_lat_field_lat_value,
-        'lon' => $row->node_data_field_lat_field_lon_value,
+        'lat' => $row->node_data_field_lon_field_lat_value,
+        'lon' => $row->node_data_field_lon_field_lon_value,
       );
       $objects[] = $object;
     }
@@ -60,3 +60,38 @@ function dm_add_scripts() {
 
   drupal_add_css($module_path . '/css/dm_map.css');
 }
+
+/**
+ * Implements hook_theme().
+ */
+function dfunc_map_theme() {
+  $module_path = drupal_get_path('module', 'dfunc_map');
+  $tpl_path = $module_path . '/tpl';
+  return array(
+    'views_view_unformatted__map__page_1' => array(
+      'arguments' => array(
+        'view'    => NULL, 
+        'title'   => NULL, 
+        'rows'    => NULL, 
+        'classes' => NULL
+      ),
+      'template' => 'views-view-unformatted--map--page-1',
+      'original hook' => 'views_view_unformatted',
+      'path' => $tpl_path,
+      'theme path' => $tpl_path,
+      'theme paths' => array($tpl_path),
+    ),
+
+    'views_view__map__page_1' => array(
+      'arguments' => array(
+        'view' => NULL,
+      ),
+      'template' => 'views-view--map--page-1',
+      'original hook' => 'views_view',
+      'path' => $tpl_path,
+      'theme path' => $tpl_path,
+      'theme paths' => array($tpl_path),
+    ),
+  );
+}
+
