@@ -3,8 +3,11 @@
  * Модуль dfunc_map
  */
 
+// машинное имя типа материала, который должен отображаться на карте
 define('DM_OBJECT_NODE_TYPE_NAME', 'service_center');
+// машинное имя вьюса, который должен содержать карту
 define('DM_MAP_VIEW_NAME', 'map');
+// машинное имя дисплея вьюса, который должен содержать карту
 define('DM_MAP_DISPLAY_NAME', 'page_1');
 
 function dfunc_map_views_post_render(&$views) {
