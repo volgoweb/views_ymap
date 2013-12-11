@@ -100,7 +100,11 @@ function dfunc_map_form_alter(&$form, &$form_state, $form_id) {
 }
 
 function exposed_city_autocomplete_after_build($form, &$form_state) {
-  $form['field_city_value']['#autocomplete_path'] = 'dm/city-autocomplete';
+  $form['city']['#autocomplete_path'] = 'dm/city-autocomplete';
+  $form['city']['#value'] = 'Введите название города ...';
+  $form['city']['#attributes'] = array('class' => 'NormalTextBox txtSearch',
+                                                              'onfocus' => "if (this.value == 'Введите название города ...') {this.value = '';}",
+                                                              'onblur' => "if (this.value == '') {this.value = 'Введите название города ...';}");
   return $form;
 }
 
