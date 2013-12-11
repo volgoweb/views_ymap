@@ -36,6 +36,8 @@ function dm_add_js_vars_about_objects($view) {
     foreach ($results as $i => $row) {
       $object = array(
         'title' => $row->node_title,
+        'address' => $row->node_data_field_lon_field_address_value,
+        'nid' => $row->nid,
         'lat' => $row->node_data_field_lon_field_lat_value,
         'lon' => $row->node_data_field_lon_field_lon_value,
       );
@@ -58,7 +60,7 @@ function dm_add_scripts() {
   $module_path = drupal_get_path('module', 'dfunc_map');
   drupal_add_js($module_path . '/js/dm_map.js');
 
-  drupal_add_css($module_path . '/css/dm_map.css');
+  // drupal_add_css($module_path . '/css/dm_map.css');
 }
 
 /**
@@ -81,17 +83,57 @@ function dfunc_map_theme() {
       'theme path' => $tpl_path,
       'theme paths' => array($tpl_path),
     ),
-
-    'views_view__map__page_1' => array(
-      'arguments' => array(
-        'view' => NULL,
-      ),
-      'template' => 'views-view--map--page-1',
-      'original hook' => 'views_view',
-      'path' => $tpl_path,
-      'theme path' => $tpl_path,
-      'theme paths' => array($tpl_path),
-    ),
   );
 }
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function dfunc_map_form_alter(&$form, &$form_state, $form_id) {
+  $exposed_map_form_id = sprintf('views_exposed_form_%s_%s', DM_MAP_VIEW_NAME, DM_MAP_DISPLAY_NAME);
+  $exposed_map_form_id = str_replace('-', '_', $exposed_map_form_id);
+  $form_inner_id       = str_replace('-', '_', $form['#id']);
+
+  if ('views_exposed_form' == $form_id && $exposed_map_form_id == $form_inner_id) {
+    $form['#after_build'][] = 'exposed_city_autocomplete_after_build';
+  }
+}
+
+function exposed_city_autocomplete_after_build($form, &$form_state) {
+  $form['field_city_value']['#autocomplete_path'] = 'dm/city-autocomplete';
+  return $form;
+}
+
+function dfunc_map_menu() {
+    $items['dm/city-autocomplete'] = array(
+        'page callback' => 'dm_city_autocomplete',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+    return $items;
+}
+
+function dm_city_autocomplete($string) {
+  if (empty($string)) {
+    exit();
+  }
+
+  $field_city_col = 'field_city_value';
+  $tbl = "content_field_city";
+  $content_type = DM_OBJECT_NODE_TYPE_NAME;
+
+  $query = "select $field_city_col from {$tbl}  inner join node on node.nid=$tbl.nid where node.type='$content_type' and $field_city_col like '%$string%'";
+
+  $result = db_query($query, $field_city_col, $tbl, $field_city_col, '%'.$string.'%');
+
+  $matches = array();
+  while ($row = db_fetch_array($result)) {
+    $city = $row[$field_city_col];
+    $matches[$city] = $city;
+  }
+
+  $matches = array_unique($matches);
+
+  print drupal_to_js($matches);
+  exit();
+}
