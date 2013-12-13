@@ -63,7 +63,7 @@ function dm_add_scripts() {
   $module_path = drupal_get_path('module', 'dfunc_map');
   drupal_add_js($module_path . '/js/dm_map.js');
 
-  // drupal_add_css($module_path . '/css/dm_map.css');
+  drupal_add_css($module_path . '/css/dm_map.css');
 }
 
 /**

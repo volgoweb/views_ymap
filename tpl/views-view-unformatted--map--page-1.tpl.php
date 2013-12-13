@@ -27,6 +27,9 @@
   <?php endif; ?>
 
   <div class="services-list__item <?php print $classes[$id]; ?>">
+    <div class="service-center__number">
+      <?php print $id + 1; ?>
+    </div>
     <?php print $row; ?>
   </div>
 <?php endforeach; ?>

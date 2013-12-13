@@ -76,7 +76,7 @@ Drupal.dfunc_map.bind_objects_items = function() {
 };
 
 Drupal.behaviors.dm_map = function() {
-  if (!Drupal.settings && !Drupal.settings.dfunc) {
+  if (!Drupal.settings && !Drupal.settings.dfunc_map) {
     return;
   }
 
