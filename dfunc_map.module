@@ -166,7 +166,7 @@ function dm_city_autocomplete($string) {
 /**
  * Фукнция получения массива городов с  указанием страны, к которому принадлежит город
  */
-function dm_get_cities_by_country() {
+function dm_get_cities() {
   $cities = array();  
   // @TODO добавить кэширование
 
@@ -174,34 +174,26 @@ function dm_get_cities_by_country() {
     $results = views_get_view_result(DM_MAP_VIEW_NAME, DM_CITIES_VIEW_DISPLAY_NAME);
     if (!empty($results)) {
       foreach ($results as $i => $row) {
-        $country = $row->term_data_tid;
-        if (!empty($country)) {
           $city = $row->node_data_field_city_field_city_value;
-          $cities[$country][] = $city;
-        }
+          $cities[] = $city;
       }
     }
   }
-  if (!empty($cities)) {
-    foreach ($cities as $country => $array) {
-      $cities[$country] = array_unique($array);
-      sort($cities[$country]);
-    }
-  }
+
+  $cities = array_unique($cities);
+  sort($cities);
 
   return $cities;
 }
 
 function dm_add_js_vars_about_cities() {
   $links = array();
-  $cities_by_country = dm_get_cities_by_country();
-  if (!empty($cities_by_country)) {
-    foreach ($cities_by_country as $country => $cities) {
-      for ($i = 0; $i < count($cities); $i++) {
-        $link['href'] = sprintf('%s?country=%d&city=%s', DM_BASE_URL, $country, $cities[$i]);
-        $link['title'] = $cities[$i];
+  $cities = dm_get_cities();
+  if (!empty($cities)) {
+    foreach ($cities as $city) {
+        $link['href'] = sprintf('%s?city=%s', DM_BASE_URL, $city);
+        $link['title'] = $city;
         $links[] = $link;
-      }
     }
   }
 
