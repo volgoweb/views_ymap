@@ -18,3 +18,23 @@
   margin-top: 5px;
   margin-right: 7px;
 }
+
+.cities-links {
+  border: 1px solid #555555;
+  background-color: white;
+  overflow: hidden;
+  padding: 5px;
+  color: #555555;
+}
+.cities-links li {
+  display: block;
+}
+
+.cities-links ul {
+  display: table-cell;
+  padding: 10px;
+}
+.cities-links .close {
+  float: right;
+  cursor: pointer;
+}

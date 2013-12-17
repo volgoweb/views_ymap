@@ -10,6 +10,10 @@ define('DM_MAP_VIEW_NAME', 'map');
 // машинное имя дисплея вьюса, который должен содержать карту
 define('DM_MAP_DISPLAY_NAME', 'page_1');
 
+define('DM_CITIES_VIEW_DISPLAY_NAME', 'block_1');
+
+define('DM_BASE_URL', '/servisnie-centri');
+
 function dfunc_map_views_post_render(&$views) {
  // dsm($views); 
 }
@@ -19,6 +23,7 @@ function dfunc_map_views_pre_render(&$view) {
       switch ($view->current_display) {
         case DM_MAP_DISPLAY_NAME:
           dm_add_js_vars_about_objects($view);
+          dm_add_js_vars_about_cities();
           dm_add_scripts();
           break;
       }
@@ -62,6 +67,7 @@ function dm_add_scripts() {
 
   $module_path = drupal_get_path('module', 'dfunc_map');
   drupal_add_js($module_path . '/js/dm_map.js');
+  drupal_add_js($module_path . '/js/dm_city_filter.js');
 
   drupal_add_css($module_path . '/css/dm_map.css');
 }
@@ -82,6 +88,17 @@ function dfunc_map_theme() {
       ),
       'template' => 'views-view-unformatted--map--page-1',
       'original hook' => 'views_view_unformatted',
+      'path' => $tpl_path,
+      'theme path' => $tpl_path,
+      'theme paths' => array($tpl_path),
+    ),
+
+    'dm_cities_links' => array(
+      'arguments' => array(
+        'links'   => NULL, 
+      ),
+      'template' => 'cities_links',
+      // 'original hook' => 'block',
       'path' => $tpl_path,
       'theme path' => $tpl_path,
       'theme paths' => array($tpl_path),
@@ -143,4 +160,55 @@ function dm_city_autocomplete($string) {
 
   print drupal_to_js($matches);
   exit();
+}
+
+
+/**
+ * Фукнция получения массива городов с  указанием страны, к которому принадлежит город
+ */
+function dm_get_cities_by_country() {
+  $cities = array();  
+  // @TODO добавить кэширование
+
+  if (defined('DM_MAP_VIEW_NAME')) {
+    $results = views_get_view_result(DM_MAP_VIEW_NAME, DM_CITIES_VIEW_DISPLAY_NAME);
+    if (!empty($results)) {
+      foreach ($results as $i => $row) {
+        $country = $row->term_data_tid;
+        if (!empty($country)) {
+          $city = $row->node_data_field_city_field_city_value;
+          $cities[$country][] = $city;
+        }
+      }
+    }
+  }
+  if (!empty($cities)) {
+    foreach ($cities as $country => $array) {
+      $cities[$country] = array_unique($array);
+      sort($cities[$country]);
+    }
+  }
+
+  return $cities;
+}
+
+function dm_add_js_vars_about_cities() {
+  $links = array();
+  $cities_by_country = dm_get_cities_by_country();
+  if (!empty($cities_by_country)) {
+    foreach ($cities_by_country as $country => $cities) {
+      for ($i = 0; $i < count($cities); $i++) {
+        $link['href'] = sprintf('%s?country=%d&city=%s', DM_BASE_URL, $country, $cities[$i]);
+        $link['title'] = $cities[$i];
+        $links[] = $link;
+      }
+    }
+  }
+
+  // выводим в js 
+  drupal_add_js(array(
+    'dfunc_map' => array(
+      'cities_links_block' => theme('dm_cities_links', $links),
+    ),
+  ), 'setting');
 }
