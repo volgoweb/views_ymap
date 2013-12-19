@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the views_ymap feature.
+ */
+
+include_once 'views_ymap_additional.features.inc';
