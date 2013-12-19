@@ -1,19 +1,19 @@
-Drupal.dfunc_map = {};
+Drupal.views_ymap = {};
 
-Drupal.dfunc_map.config = {
+Drupal.views_ymap.config = {
   base_zoom: 15,
 };
 
-Drupal.dfunc_map.map = {};
+Drupal.views_ymap.map = {};
 
-Drupal.dfunc_map.myCollection = {};
+Drupal.views_ymap.myCollection = {};
 
 /**
  * Отображает на карте указанные объекты
  */
-Drupal.dfunc_map.show_objects = function(objects) {
-	var map = Drupal.dfunc_map.map;
-	var myCollection = Drupal.dfunc_map.myCollection;
+Drupal.views_ymap.show_objects = function(objects) {
+	var map = Drupal.views_ymap.map;
+	var myCollection = Drupal.views_ymap.myCollection;
 
   myCollection.removeAll();
 
@@ -38,16 +38,16 @@ Drupal.dfunc_map.show_objects = function(objects) {
   // Set center and zoom using collection bounds.
   map.setBounds(myCollection.getBounds());
   
-  Drupal.dfunc_map.correct_zoom();
+  Drupal.views_ymap.correct_zoom();
 };
 
 /**
  * Переводит фокус карты на объект
  */
-Drupal.dfunc_map.go_to = function(lat, lon, nid) {
-	var map          = Drupal.dfunc_map.map,
-      myCollection = Drupal.dfunc_map.myCollection,
-      config       = Drupal.dfunc_map.config;
+Drupal.views_ymap.go_to = function(lat, lon, nid) {
+	var map          = Drupal.views_ymap.map,
+      myCollection = Drupal.views_ymap.myCollection,
+      config       = Drupal.views_ymap.config;
 
   map.setCenter([lat, lon], config.base_zoom);
 
@@ -62,7 +62,7 @@ Drupal.dfunc_map.go_to = function(lat, lon, nid) {
 /**
  * Вешает обработчики для списка объектов
  */
-Drupal.dfunc_map.bind_objects_items = function() {
+Drupal.views_ymap.bind_objects_items = function() {
   $('.map-object-item_js').bind('click', function(event) {
     event.preventDefault();
     event.stopPropagation();
@@ -71,19 +71,19 @@ Drupal.dfunc_map.bind_objects_items = function() {
     var lon = $(this).attr('lon');
     var title = $(this).text();
     var nid = $(this).attr('nid');
-    Drupal.dfunc_map.go_to(lat, lon, nid);
+    Drupal.views_ymap.go_to(lat, lon, nid);
   });
 };
 
-Drupal.behaviors.dm_map = function() {
-  if (!Drupal.settings && !Drupal.settings.dfunc_map) {
+Drupal.behaviors.vy_map = function() {
+  if (!Drupal.settings && !Drupal.settings.views_ymap) {
     return;
   }
 
-  var config = Drupal.dfunc_map.config;
+  var config = Drupal.views_ymap.config;
 	
 	ymaps.ready(function () {
-    Drupal.dfunc_map.map = new ymaps.Map('services-ymap', {
+    Drupal.views_ymap.map = new ymaps.Map('services-ymap', {
         center: [56.326944, 44.0075],
         zoom: config.base_zoom,
         type: 'yandex#map',
@@ -91,26 +91,26 @@ Drupal.behaviors.dm_map = function() {
     });
 	
     //Добавляем элементы управления
-     Drupal.dfunc_map.map.controls                
+     Drupal.views_ymap.map.controls                
               .add('zoomControl')                
               .add('typeSelector')                
               .add('mapTools');
         
-    Drupal.dfunc_map.myCollection = new ymaps.GeoObjectCollection();				
+    Drupal.views_ymap.myCollection = new ymaps.GeoObjectCollection();				
 
-    Drupal.dfunc_map.show_objects(Drupal.settings.dfunc_map.map_objects);
+    Drupal.views_ymap.show_objects(Drupal.settings.views_ymap.map_objects);
 
-    Drupal.dfunc_map.bind_objects_items();
+    Drupal.views_ymap.bind_objects_items();
   })
 };
 
 /**
  * При слишком маленьком масштабе увеличивает его
  */
-Drupal.dfunc_map.correct_zoom = function() {
-	var map    = Drupal.dfunc_map.map,
+Drupal.views_ymap.correct_zoom = function() {
+	var map    = Drupal.views_ymap.map,
       zoom   = map.getZoom();
-      config = Drupal.dfunc_map.config;
+      config = Drupal.views_ymap.config;
 
   if (zoom > config.base_zoom) {
     map.setZoom(config.base_zoom);

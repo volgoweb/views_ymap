@@ -3,7 +3,7 @@
  */
 
 
-Drupal.behaviors.dm_city_filter = function (context) {
+Drupal.behaviors.vy_city_filter = function (context) {
   var $form = $('#views-exposed-form-map-page-1'), 
       $city_input = $form.find('input[name="city"]');
   $city_input.bind('click', function() {
@@ -21,7 +21,7 @@ Drupal.behaviors.dm_city_filter = function (context) {
 
 
   function show_cities_block() {
-    var block = Drupal.settings.dfunc_map.cities_links_block;
+    var block = Drupal.settings.views_ymap.cities_links_block;
     var top = $city_input.position().top;
     var height = $city_input.height();
     $city_input.after(block);

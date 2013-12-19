@@ -1,0 +1,4 @@
+name = Views ymap
+description = Отображение объектов вьюса на карте
+package = Ruswebs
+core = 7.x

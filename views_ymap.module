@@ -1,30 +1,30 @@
 <?php
 /*
- * Модуль dfunc_map
+ * Модуль views_ymap
  */
 
 // машинное имя типа материала, который должен отображаться на карте
-define('DM_OBJECT_NODE_TYPE_NAME', 'service_center');
+define('VY_OBJECT_NODE_TYPE_NAME', 'service_center');
 // машинное имя вьюса, который должен содержать карту
-define('DM_MAP_VIEW_NAME', 'map');
+define('VY_MAP_VIEW_NAME', 'map');
 // машинное имя дисплея вьюса, который должен содержать карту
-define('DM_MAP_DISPLAY_NAME', 'page_1');
+define('VY_MAP_DISPLAY_NAME', 'page_1');
 
-define('DM_CITIES_VIEW_DISPLAY_NAME', 'block_1');
+define('VY_CITIES_VIEW_DISPLAY_NAME', 'block_1');
 
-define('DM_BASE_URL', '/servisnie-centri');
+define('VY_BASE_URL', '/servisnie-centri');
 
-function dfunc_map_views_post_render(&$views) {
+function views_ymap_views_post_render(&$views) {
  // dsm($views); 
 }
-function dfunc_map_views_pre_render(&$view) {
+function views_ymap_views_pre_render(&$view) {
   switch ($view->name) {
-    case DM_MAP_VIEW_NAME:
+    case VY_MAP_VIEW_NAME:
       switch ($view->current_display) {
-        case DM_MAP_DISPLAY_NAME:
-          dm_add_js_vars_about_objects($view);
-          dm_add_js_vars_about_cities();
-          dm_add_scripts();
+        case VY_MAP_DISPLAY_NAME:
+          vy_add_js_vars_about_objects($view);
+          vy_add_js_vars_about_cities();
+          vy_add_scripts();
           break;
       }
       break;
@@ -36,7 +36,7 @@ function dfunc_map_views_pre_render(&$view) {
  * Создает в js объекты, содержащие данные о найденных объектах,
  * которые надо отобразить на карте
  */
-function dm_add_js_vars_about_objects($view) {
+function vy_add_js_vars_about_objects($view) {
   $objects = array();
 
   $results = $view->result;
@@ -55,28 +55,28 @@ function dm_add_js_vars_about_objects($view) {
 
   // выводим в js все найденные объекты
   drupal_add_js(array(
-    'dfunc_map' => array(
+    'views_ymap' => array(
       'map_objects' => $objects,
     ),
   ), 'setting');
 }
 
-function dm_add_scripts() {
+function vy_add_scripts() {
   $external_js = 'http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU';
   drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
 
-  $module_path = drupal_get_path('module', 'dfunc_map');
-  drupal_add_js($module_path . '/js/dm_map.js');
-  drupal_add_js($module_path . '/js/dm_city_filter.js');
+  $module_path = drupal_get_path('module', 'views_ymap');
+  drupal_add_js($module_path . '/js/vy_map.js');
+  drupal_add_js($module_path . '/js/vy_city_filter.js');
 
-  drupal_add_css($module_path . '/css/dm_map.css');
+  drupal_add_css($module_path . '/css/vy_map.css');
 }
 
 /**
  * Implements hook_theme().
  */
-function dfunc_map_theme() {
-  $module_path = drupal_get_path('module', 'dfunc_map');
+function views_ymap_theme() {
+  $module_path = drupal_get_path('module', 'views_ymap');
   $tpl_path = $module_path . '/tpl';
   return array(
     'views_view_unformatted__map__page_1' => array(
@@ -93,7 +93,7 @@ function dfunc_map_theme() {
       'theme paths' => array($tpl_path),
     ),
 
-    'dm_cities_links' => array(
+    'vy_cities_links' => array(
       'arguments' => array(
         'links'   => NULL, 
       ),
@@ -109,8 +109,8 @@ function dfunc_map_theme() {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function dfunc_map_form_alter(&$form, &$form_state, $form_id) {
-  $exposed_map_form_id = sprintf('views_exposed_form_%s_%s', DM_MAP_VIEW_NAME, DM_MAP_DISPLAY_NAME);
+function views_ymap_form_alter(&$form, &$form_state, $form_id) {
+  $exposed_map_form_id = sprintf('views_exposed_form_%s_%s', VY_MAP_VIEW_NAME, VY_MAP_DISPLAY_NAME);
   $exposed_map_form_id = str_replace('-', '_', $exposed_map_form_id);
   $form_inner_id       = str_replace('-', '_', $form['#id']);
 
@@ -128,23 +128,23 @@ function exposed_city_autocomplete_after_build($form, &$form_state) {
   return $form;
 }
 
-function dfunc_map_menu() {
+function views_ymap_menu() {
     $items['dm/city-autocomplete'] = array(
-        'page callback' => 'dm_city_autocomplete',
+        'page callback' => 'vy_city_autocomplete',
         'access arguments' => array('access content'),
         'type' => MENU_CALLBACK
     );
     return $items;
 }
 
-function dm_city_autocomplete($string) {
+function vy_city_autocomplete($string) {
   if (empty($string)) {
     exit();
   }
 
   $field_city_col = 'field_city_value';
   $tbl = "content_field_city";
-  $content_type = DM_OBJECT_NODE_TYPE_NAME;
+  $content_type = VY_OBJECT_NODE_TYPE_NAME;
 
   $query = "select $field_city_col from {$tbl}  inner join node on node.nid=$tbl.nid where node.type='$content_type' and $field_city_col like '%$string%'";
 
@@ -166,12 +166,12 @@ function dm_city_autocomplete($string) {
 /**
  * Фукнция получения массива городов с  указанием страны, к которому принадлежит город
  */
-function dm_get_cities() {
+function vy_get_cities() {
   $cities = array();  
   // @TODO добавить кэширование
 
-  if (defined('DM_MAP_VIEW_NAME')) {
-    $results = views_get_view_result(DM_MAP_VIEW_NAME, DM_CITIES_VIEW_DISPLAY_NAME);
+  if (defined('VY_MAP_VIEW_NAME')) {
+    $results = views_get_view_result(VY_MAP_VIEW_NAME, VY_CITIES_VIEW_DISPLAY_NAME);
     if (!empty($results)) {
       foreach ($results as $i => $row) {
           $city = $row->node_data_field_city_field_city_value;
@@ -186,12 +186,12 @@ function dm_get_cities() {
   return $cities;
 }
 
-function dm_add_js_vars_about_cities() {
+function vy_add_js_vars_about_cities() {
   $links = array();
-  $cities = dm_get_cities();
+  $cities = vy_get_cities();
   if (!empty($cities)) {
     foreach ($cities as $city) {
-        $link['href'] = sprintf('%s?city=%s', DM_BASE_URL, $city);
+        $link['href'] = sprintf('%s?city=%s', VY_BASE_URL, $city);
         $link['title'] = $city;
         $links[] = $link;
     }
@@ -199,8 +199,8 @@ function dm_add_js_vars_about_cities() {
 
   // выводим в js 
   drupal_add_js(array(
-    'dfunc_map' => array(
-      'cities_links_block' => theme('dm_cities_links', $links),
+    'views_ymap' => array(
+      'cities_links_block' => theme('vy_cities_links', $links),
     ),
   ), 'setting');
 }

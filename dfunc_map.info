@@ -1,4 +1,0 @@
-name = dfunc_map
-description = Отображение объектов на карте
-package = Custom
-core = 6.x
