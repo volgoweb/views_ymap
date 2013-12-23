@@ -2,3 +2,9 @@ name = Views ymap
 description = Отображение объектов вьюса на карте
 package = Ruswebs
 core = 7.x
+
+; dependencies[] = features
+dependencies[] = number
+dependencies[] = text
+dependencies[] = views
+; dependencies[] = views_ymap_additional
